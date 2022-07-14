@@ -9,5 +9,8 @@
         <module name="TomcatTest" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="TomcatTest" target="8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

@@ -10,6 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class MyTomcat {
 
@@ -22,6 +26,7 @@ public class MyTomcat {
         }
     }
 
+
     //启动tomcat的主方法
     public void startUp() throws  Exception {
         //加载servlet信息
@@ -30,18 +35,24 @@ public class MyTomcat {
 
         //定义ServerSocket8080端口
         ServerSocket serverSocket = new ServerSocket(8081);
+
+        //创建线程池
+        ExecutorService executorService = Executors.newFixedThreadPool(15);
         while (true){
             Socket socket = serverSocket.accept();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        handler(socket);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
+            executorService.execute(
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                handler(socket);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    })
+            );
+
         }
     }
 
@@ -72,7 +83,7 @@ public class MyTomcat {
     //解析http请求
     public void getInput(InputStream inputStream, Request request) throws IOException {
         int count = 0;
-        while (count ==0){
+        while (count == 0){
             count = inputStream.available();
         }
         byte[] bytes = new byte[count];
